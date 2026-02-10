@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { getToken } from "../../lib/apiClient";
 import { useTheme } from "../../contexts/ThemeContext";
-import { getTenantRoute } from "../../lib/routes";
+import { getTenantRoute, getTenantSlugFromPath } from "../../lib/routes";
 
 // Base tenant dashboard routes (tenantSlug will be injected at runtime)
 const tenantNav = [
@@ -68,7 +68,9 @@ export default function AdminLayout({ title, children }) {
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/login");
+    const slug = getTenantSlugFromPath(router.asPath || router.pathname);
+    const target = slug ? `/r/${encodeURIComponent(slug)}/login` : "/login";
+    router.push(target);
   }
 
   return (

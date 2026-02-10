@@ -1,6 +1,20 @@
 import { NextResponse } from "next/server";
 import { verifyJwt } from "./lib/auth";
 
+function buildLoginRedirect(request, pathname, tenantDashboardMatch) {
+  const url = request.nextUrl.clone();
+
+  if (tenantDashboardMatch) {
+    const slug = tenantDashboardMatch[1];
+    url.pathname = `/r/${slug}/login`;
+  } else {
+    url.pathname = "/login";
+  }
+
+  url.searchParams.set("from", pathname);
+  return NextResponse.redirect(url);
+}
+
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
 
@@ -15,29 +29,21 @@ export async function middleware(request) {
   const token = request.cookies.get("token")?.value;
 
   if (!token) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    url.searchParams.set("from", pathname);
-    return NextResponse.redirect(url);
+    return buildLoginRedirect(request, pathname, tenantDashboardMatch);
   }
 
   const payload = await verifyJwt(token);
 
   const allowedRoles = ["super_admin", "restaurant_admin", "staff"];
   if (!payload || !allowedRoles.includes(payload.role)) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    return NextResponse.redirect(url);
+    return buildLoginRedirect(request, pathname, tenantDashboardMatch);
   }
 
   // Optional: prevent cross-tenant access if JWT contains tenantSlug
   if (tenantDashboardMatch && payload.tenantSlug) {
     const slugFromPath = tenantDashboardMatch[1];
     if (slugFromPath !== payload.tenantSlug) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/login";
-      url.searchParams.set("from", pathname);
-      return NextResponse.redirect(url);
+      return buildLoginRedirect(request, pathname, tenantDashboardMatch);
     }
   }
 
