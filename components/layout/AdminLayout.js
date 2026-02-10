@@ -64,10 +64,27 @@ export default function AdminLayout({ title, children, suspended = false }) {
 
   const navItems = role === "super_admin" ? superNav : tenantNav;
   const roleLabel =
-    role === "super_admin" ? "Super Admin" : role === "restaurant_admin" ? "Restaurant Admin" : "Staff";
+    role === "super_admin"
+      ? "Super Admin"
+      : role === "restaurant_admin"
+      ? "Restaurant Admin"
+      : role === "admin"
+      ? "Admin"
+      : role === "product_manager"
+      ? "Product Manager"
+      : role === "cashier"
+      ? "Cashier"
+      : role === "manager"
+      ? "Manager"
+      : role === "kitchen_staff"
+      ? "Kitchen Staff"
+      : "Staff";
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem("restaurantos_auth");
+    }
     const slug = getTenantSlugFromPath(router.asPath || router.pathname);
     const target = slug ? `/r/${encodeURIComponent(slug)}/login` : "/login";
     router.push(target);

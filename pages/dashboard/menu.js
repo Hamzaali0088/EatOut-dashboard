@@ -13,6 +13,7 @@ import {
   SubscriptionInactiveError
 } from "../../lib/apiClient";
 import { Plus, Trash2, Edit2, ToggleLeft, ToggleRight } from "lucide-react";
+import { useConfirmDialog } from "../../contexts/ConfirmDialogContext";
 
 export default function MenuPage() {
   const [categories, setCategories] = useState([]);
@@ -28,6 +29,7 @@ export default function MenuPage() {
 
   const [suspended, setSuspended] = useState(false);
   const [error, setError] = useState("");
+  const { confirm } = useConfirmDialog();
 
   useEffect(() => {
     (async () => {
@@ -77,14 +79,22 @@ export default function MenuPage() {
   }
 
   async function handleDeleteCategory(id) {
-    if (!confirm("Delete category and its items?")) return;
+    const ok = await confirm({
+      title: "Delete category",
+      message: "Delete this category and all its menu items? This cannot be undone."
+    });
+    if (!ok) return;
     await deleteCategory(id);
     setCategories(prev => prev.filter(c => c.id !== id));
     setItems(prev => prev.filter(i => i.categoryId !== id));
   }
 
   async function handleDeleteItem(id) {
-    if (!confirm("Delete this menu item?")) return;
+    const ok = await confirm({
+      title: "Delete menu item",
+      message: "Delete this menu item? This cannot be undone."
+    });
+    if (!ok) return;
     await deleteItem(id);
     setItems(prev => prev.filter(i => i.id !== id));
   }

@@ -4,7 +4,16 @@ import Link from "next/link";
 import { login } from "../lib/apiClient";
 import { ShieldCheck, Loader2, Eye, EyeOff } from "lucide-react";
 
-const ALLOWED_ROLES = ["super_admin", "restaurant_admin", "staff"];
+const ALLOWED_ROLES = [
+  "super_admin",
+  "restaurant_admin",
+  "staff",
+  "admin",
+  "product_manager",
+  "cashier",
+  "manager",
+  "kitchen_staff"
+];
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -52,7 +61,11 @@ export default function LoginPage() {
       if (typeof window !== "undefined") {
         window.localStorage.setItem(
           "restaurantos_auth",
-          JSON.stringify({ user, token: data.token || null })
+          JSON.stringify({
+            user,
+            token: data.token || null,
+            refreshToken: data.refreshToken || null
+          })
         );
       }
 
@@ -150,7 +163,8 @@ export default function LoginPage() {
         </div>
 
         <p className="mt-4 text-[11px] text-neutral-500 text-center">
-          Use your RestaurantOS credentials (super_admin, restaurant_admin, or staff).
+          Use your RestaurantOS credentials (super_admin, restaurant_admin, admin, product manager,
+          cashier, manager, or kitchen staff).
         </p>
       </div>
     </div>

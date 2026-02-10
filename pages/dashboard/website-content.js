@@ -11,6 +11,7 @@ export default function WebsiteContentPage() {
   const [activeTab, setActiveTab] = useState("hero");
   const [suspended, setSuspended] = useState(false);
   const [error, setError] = useState("");
+  const [saveMessage, setSaveMessage] = useState(null);
 
   useEffect(() => {
     loadSettings();
@@ -40,9 +41,9 @@ export default function WebsiteContentPage() {
     setSaving(true);
     try {
       await updateWebsiteSettings(settings);
-      alert("Website content saved successfully!");
+      setSaveMessage({ type: "success", text: "Website content saved successfully!" });
     } catch (err) {
-      alert("Failed to save: " + err.message);
+      setSaveMessage({ type: "error", text: "Failed to save: " + (err.message || "Unknown error") });
     } finally {
       setSaving(false);
     }
@@ -88,6 +89,17 @@ export default function WebsiteContentPage() {
 
   return (
     <AdminLayout title="Website Content" suspended={suspended}>
+      {saveMessage && (
+        <div
+          className={`mb-4 rounded-lg border px-4 py-2 text-xs ${
+            saveMessage.type === "success"
+              ? "border-emerald-300 bg-emerald-50 text-emerald-800"
+              : "border-red-300 bg-red-50 text-red-700"
+          }`}
+        >
+          {saveMessage.text}
+        </div>
+      )}
       {error && (
         <div className="mb-4 rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-xs text-red-700">
           {error}

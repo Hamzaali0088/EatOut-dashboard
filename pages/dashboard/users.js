@@ -4,11 +4,14 @@ import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
 import { getUsers, createUser, updateUser, deleteUser, SubscriptionInactiveError } from "../../lib/apiClient";
 import { UserPlus, Trash2, Edit3, Shield, UserCircle2 } from "lucide-react";
+import { useConfirmDialog } from "../../contexts/ConfirmDialogContext";
 
 const ROLE_OPTIONS = [
   { value: "admin", label: "Admin" },
-  { value: "employee", label: "Employee" },
-  { value: "customer", label: "Customer" }
+  { value: "product_manager", label: "Product manager" },
+  { value: "cashier", label: "Cashier" },
+  { value: "manager", label: "Manager" },
+  { value: "kitchen_staff", label: "Kitchen staff" }
 ];
 
 export default function UsersPage() {
@@ -18,11 +21,12 @@ export default function UsersPage() {
     name: "",
     email: "",
     password: "",
-    role: "employee"
+    role: "manager"
   });
   const [loading, setLoading] = useState(false);
   const [suspended, setSuspended] = useState(false);
   const [error, setError] = useState("");
+  const { confirm } = useConfirmDialog();
 
   useEffect(() => {
     (async () => {
@@ -46,7 +50,7 @@ export default function UsersPage() {
       name: "",
       email: "",
       password: "",
-      role: "employee"
+      role: "manager"
     });
   }
 
@@ -91,7 +95,16 @@ export default function UsersPage() {
   }
 
   async function handleDelete(id) {
-    if (!confirm("Delete this user? This cannot be undone.")) return;
+    const target = users.find(u => u.id === id);
+    if (target?.role === "restaurant_admin") {
+      // Owner / primary admin cannot be deleted from the UI
+      return;
+    }
+    const ok = await confirm({
+      title: "Delete user",
+      message: "Delete this user? This cannot be undone."
+    });
+    if (!ok) return;
     await deleteUser(id);
     setUsers(prev => prev.filter(u => u.id !== id));
     if (form.id === id) resetForm();
@@ -108,13 +121,43 @@ export default function UsersPage() {
         </span>
       );
     }
-    if (role === "employee") {
+    if (role === "product_manager") {
       return (
         <span
           className={`${base} border-amber-400/60 bg-amber-400/10 text-amber-200`}
         >
           <UserCircle2 className="w-3 h-3" />
-          Employee
+          Product manager
+        </span>
+      );
+    }
+    if (role === "cashier") {
+      return (
+        <span
+          className={`${base} border-emerald-400/60 bg-emerald-400/10 text-emerald-200`}
+        >
+          <UserCircle2 className="w-3 h-3" />
+          Cashier
+        </span>
+      );
+    }
+    if (role === "manager") {
+      return (
+        <span
+          className={`${base} border-sky-400/60 bg-sky-400/10 text-sky-200`}
+        >
+          <UserCircle2 className="w-3 h-3" />
+          Manager
+        </span>
+      );
+    }
+    if (role === "kitchen_staff") {
+      return (
+        <span
+          className={`${base} border-lime-400/60 bg-lime-400/10 text-lime-200`}
+        >
+          <UserCircle2 className="w-3 h-3" />
+          Kitchen staff
         </span>
       );
     }
@@ -122,7 +165,7 @@ export default function UsersPage() {
       <span
         className={`${base} border-neutral-600 bg-neutral-800/60 text-neutral-200`}
       >
-        Customer
+        {role}
       </span>
     );
   }
@@ -139,11 +182,12 @@ export default function UsersPage() {
           title={form.id ? "Edit User" : "Create User"}
           description="Invite admins and employees or register customers manually."
         >
-          <form onSubmit={handleSubmit} className="space-y-3 text-xs">
+          <form onSubmit={handleSubmit} className="space-y-3 text-xs" autoComplete="off">
             <div className="space-y-1">
               <label className="text-gray-700 dark:text-neutral-300 text-[11px]">Name</label>
               <input
                 type="text"
+                autoComplete="off"
                 value={form.name}
                 onChange={e => setForm(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="Full name"
@@ -154,6 +198,7 @@ export default function UsersPage() {
               <label className="text-gray-700 dark:text-neutral-300 text-[11px]">Email</label>
               <input
                 type="email"
+                autoComplete="off"
                 value={form.email}
                 onChange={e => setForm(prev => ({ ...prev, email: e.target.value }))}
                 placeholder="name@example.com"
@@ -166,6 +211,7 @@ export default function UsersPage() {
               </label>
               <input
                 type="password"
+                autoComplete="new-password"
                 value={form.password}
                 onChange={e =>
                   setForm(prev => ({ ...prev, password: e.target.value }))
@@ -243,14 +289,16 @@ export default function UsersPage() {
                         >
                           <Edit3 className="w-3 h-3" />
                         </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          className="px-2 text-red-400 border-red-500/40 hover:bg-red-500/10"
-                          onClick={() => handleDelete(user.id)}
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </Button>
+                        {user.role !== "restaurant_admin" && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            className="px-2 text-red-400 border-red-500/40 hover:bg-red-500/10"
+                            onClick={() => handleDelete(user.id)}
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        )}
                       </div>
                     </td>
                   </tr>

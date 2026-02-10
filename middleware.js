@@ -6,7 +6,8 @@ function buildLoginRedirect(request, pathname, tenantDashboardMatch) {
 
   if (tenantDashboardMatch) {
     const slug = tenantDashboardMatch[1];
-    url.pathname = `/r/${slug}/login`;
+    const role = tenantDashboardMatch[2];
+    url.pathname = role ? `/r/${slug}/${role}/login` : `/r/${slug}/login`;
   } else {
     url.pathname = "/login";
   }
@@ -20,7 +21,7 @@ export async function middleware(request) {
 
   // Protect legacy platform dashboard and tenant dashboards
   const isPlatformDashboard = pathname.startsWith("/dashboard");
-  const tenantDashboardMatch = pathname.match(/^\/r\/([^/]+)\/dashboard(\/.*)?$/);
+  const tenantDashboardMatch = pathname.match(/^\/r\/([^/]+)\/(?:([^/]+)\/)?dashboard(\/.*)?$/);
 
   if (!isPlatformDashboard && !tenantDashboardMatch) {
     return NextResponse.next();
@@ -34,7 +35,16 @@ export async function middleware(request) {
 
   const payload = await verifyJwt(token);
 
-  const allowedRoles = ["super_admin", "restaurant_admin", "staff"];
+  const allowedRoles = [
+    "super_admin",
+    "restaurant_admin",
+    "staff",
+    "admin",
+    "product_manager",
+    "cashier",
+    "manager",
+    "kitchen_staff"
+  ];
   if (!payload || !allowedRoles.includes(payload.role)) {
     return buildLoginRedirect(request, pathname, tenantDashboardMatch);
   }
@@ -51,6 +61,10 @@ export async function middleware(request) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/r/:tenantSlug/dashboard/:path*"]
+  matcher: [
+    "/dashboard/:path*",
+    "/r/:tenantSlug/dashboard/:path*",
+    "/r/:tenantSlug/:role/dashboard/:path*"
+  ]
 };
 

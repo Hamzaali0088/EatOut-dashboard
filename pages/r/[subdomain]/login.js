@@ -14,7 +14,7 @@ const ROLES = [
 
 export default function TenantLoginPage() {
   const router = useRouter();
-  const { subdomain } = router.query;
+  const { subdomain, role: roleFromQuery } = router.query;
 
   const [selectedRole, setSelectedRole] = useState(ROLES[0].id);
   const [username, setUsername] = useState("");
@@ -29,11 +29,21 @@ export default function TenantLoginPage() {
     if (!subdomain) return;
     if (typeof window === "undefined") return;
 
+    // Preselect role from URL query if valid
+    if (typeof roleFromQuery === "string") {
+      const found = ROLES.find(r => r.id === roleFromQuery);
+      if (found) {
+        setSelectedRole(found.id);
+      }
+    }
+
     const token = getToken();
     if (token) {
-      router.replace(`/r/${encodeURIComponent(subdomain)}/dashboard`);
+      const base = `/r/${encodeURIComponent(subdomain)}`;
+      const roleSegment = typeof roleFromQuery === "string" ? `/${encodeURIComponent(roleFromQuery)}` : "";
+      router.replace(`${base}${roleSegment}/dashboard`);
     }
-  }, [router, subdomain]);
+  }, [router, subdomain, roleFromQuery]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -46,16 +56,18 @@ export default function TenantLoginPage() {
       const user = data.user || data;
 
       // Persist auth info for client-side use
+      const effectiveRole = user.role || selectedRole;
       if (typeof window !== "undefined") {
         window.localStorage.setItem(
           "restaurantos_auth",
           JSON.stringify({
             user: {
               ...user,
-              role: user.role || selectedRole,
+              role: effectiveRole,
               tenantSlug: user.tenantSlug || subdomain || user.restaurantSlug
             },
             token: data.token || null,
+            refreshToken: data.refreshToken || null,
             tenantSlug: subdomain || user.restaurantSlug || null,
             shopName: shopName || null
           })
@@ -64,7 +76,7 @@ export default function TenantLoginPage() {
 
       const slug = subdomain || user.restaurantSlug;
       const target = slug
-        ? `/r/${encodeURIComponent(slug)}/dashboard`
+        ? `/r/${encodeURIComponent(slug)}/${encodeURIComponent(effectiveRole)}/dashboard`
         : "/dashboard/overview";
 
       window.location.href = target;

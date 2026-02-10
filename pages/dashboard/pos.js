@@ -13,6 +13,7 @@ export default function POSPage() {
   const [showCheckout, setShowCheckout] = useState(false);
   const [suspended, setSuspended] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   useEffect(() => {
     loadMenu();
@@ -66,7 +67,7 @@ export default function POSPage() {
 
   const handleCheckout = async () => {
     if (cart.length === 0) {
-      alert("Cart is empty!");
+      setError("Cart is empty!");
       return;
     }
     
@@ -78,7 +79,8 @@ export default function POSPage() {
       total
     });
     
-    alert("Order placed successfully!");
+    setError("");
+    setSuccess("Order placed successfully!");
     setCart([]);
     setCustomerName("");
     setShowCheckout(false);
@@ -89,6 +91,11 @@ export default function POSPage() {
       {error && (
         <div className="mb-4 rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-xs text-red-700">
           {error}
+        </div>
+      )}
+      {success && (
+        <div className="mb-4 rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-2 text-xs text-emerald-800">
+          {success}
         </div>
       )}
       <div className="grid gap-4 lg:grid-cols-[1fr_400px] h-[calc(100vh-180px)]">
