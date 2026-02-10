@@ -9,7 +9,8 @@ import {
   deleteCategory,
   createItem,
   updateItem,
-  deleteItem
+  deleteItem,
+  SubscriptionInactiveError
 } from "../../lib/apiClient";
 import { Plus, Trash2, Edit2, ToggleLeft, ToggleRight } from "lucide-react";
 
@@ -25,14 +26,28 @@ export default function MenuPage() {
     description: ""
   });
 
+  const [suspended, setSuspended] = useState(false);
+  const [error, setError] = useState("");
+
   useEffect(() => {
-    getMenu().then(({ categories, items }) => {
-      setCategories(categories);
-      setItems(items);
-      if (!itemForm.categoryId && categories[0]) {
-        setItemForm(prev => ({ ...prev, categoryId: categories[0].id }));
+    (async () => {
+      try {
+        const { categories, items } = await getMenu();
+        setCategories(categories);
+        setItems(items);
+        if (!itemForm.categoryId && categories[0]) {
+          setItemForm(prev => ({ ...prev, categoryId: categories[0].id }));
+        }
+      } catch (err) {
+        if (err instanceof SubscriptionInactiveError) {
+          setSuspended(true);
+        } else {
+          console.error("Failed to load menu:", err);
+          setError(err.message || "Failed to load menu");
+        }
       }
-    });
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function handleCreateCategory(e) {
@@ -75,7 +90,12 @@ export default function MenuPage() {
   }
 
   return (
-    <AdminLayout title="Menu Management">
+    <AdminLayout title="Menu Management" suspended={suspended}>
+      {error && (
+        <div className="mb-4 rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-xs text-red-700">
+          {error}
+        </div>
+      )}
       <div className="grid gap-4 md:grid-cols-2 mb-6">
         <Card
           title="Categories"

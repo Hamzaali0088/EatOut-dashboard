@@ -2,13 +2,15 @@ import { useEffect, useState } from "react";
 import AdminLayout from "../../components/layout/AdminLayout";
 import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
-import { getWebsiteSettings, updateWebsiteSettings } from "../../lib/apiClient";
+import { getWebsiteSettings, updateWebsiteSettings, SubscriptionInactiveError } from "../../lib/apiClient";
 import { Plus, Trash2, Save, Image as ImageIcon } from "lucide-react";
 
 export default function WebsiteContentPage() {
   const [settings, setSettings] = useState(null);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("hero");
+  const [suspended, setSuspended] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     loadSettings();
@@ -24,7 +26,12 @@ export default function WebsiteContentPage() {
       if (!data.themeColors) data.themeColors = { primary: '#EF4444', secondary: '#FFA500' };
       setSettings(data);
     } catch (err) {
-      console.error("Failed to load settings:", err);
+      if (err instanceof SubscriptionInactiveError) {
+        setSuspended(true);
+      } else {
+        console.error("Failed to load settings:", err);
+        setError(err.message || "Failed to load website settings");
+      }
     }
   }
 
@@ -73,14 +80,19 @@ export default function WebsiteContentPage() {
 
   if (!settings) {
     return (
-      <AdminLayout title="Website Content">
+      <AdminLayout title="Website Content" suspended={suspended}>
         <p className="text-sm text-gray-600 dark:text-neutral-400">Loading...</p>
       </AdminLayout>
     );
   }
 
   return (
-    <AdminLayout title="Website Content">
+    <AdminLayout title="Website Content" suspended={suspended}>
+      {error && (
+        <div className="mb-4 rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-xs text-red-700">
+          {error}
+        </div>
+      )}
       <div className="mb-6 flex items-center justify-between">
         <div className="flex gap-2">
           <button

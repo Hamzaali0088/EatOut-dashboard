@@ -51,7 +51,7 @@ function decodeRoleFromToken(token) {
   }
 }
 
-export default function AdminLayout({ title, children }) {
+export default function AdminLayout({ title, children, suspended = false }) {
   const router = useRouter();
   const [role, setRole] = useState(null);
   const { theme, toggleTheme } = useTheme();
@@ -97,6 +97,18 @@ export default function AdminLayout({ title, children }) {
 
             const isActive = router.asPath.startsWith(href);
             const Icon = item.icon;
+
+            if (suspended && role !== "super_admin") {
+              return (
+                <div
+                  key={href}
+                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-400 dark:text-neutral-600 bg-gray-100/60 dark:bg-neutral-900/60 cursor-not-allowed"
+                >
+                  <Icon className="w-4 h-4" />
+                  {item.label}
+                </div>
+              );
+            }
 
             return (
               <Link
@@ -189,8 +201,32 @@ export default function AdminLayout({ title, children }) {
           </div>
         </header>
 
-        <main className="flex-1 px-4 md:px-8 py-6 overflow-y-auto bg-white dark:bg-black">
-          <div className="max-w-6xl mx-auto">{children}</div>
+        <main className="relative flex-1 px-4 md:px-8 py-6 overflow-y-auto bg-white dark:bg-black">
+          <div className="max-w-6xl mx-auto">{!suspended && children}</div>
+
+          {suspended && role !== "super_admin" && (
+            <>
+              <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40" />
+              <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+                <div className="max-w-md w-full rounded-2xl border border-amber-300 bg-amber-50 px-6 py-5 text-sm text-amber-900 shadow-xl">
+                  <h2 className="text-base font-semibold mb-1">Subscription inactive or expired</h2>
+                  <p className="mb-4">
+                    This restaurant&apos;s subscription is currently inactive. Dashboard insights are
+                    temporarily unavailable. Please contact your platform administrator to reactivate
+                    your subscription.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="mt-2 inline-flex items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-xs font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </main>
       </div>
     </div>

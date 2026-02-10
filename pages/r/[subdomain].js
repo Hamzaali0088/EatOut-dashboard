@@ -12,7 +12,7 @@ function groupByCategory(menu) {
   return byCategory;
 }
 
-export default function TenantWebsitePage({ restaurant, menu, categories }) {
+export default function TenantWebsitePage({ restaurant, menu, categories, suspended }) {
   const grouped = groupByCategory(menu);
   const [currentSlide, setCurrentSlide] = useState(0);
   
@@ -30,6 +30,25 @@ export default function TenantWebsitePage({ restaurant, menu, categories }) {
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + Math.max(heroSlides.length, 1)) % Math.max(heroSlides.length, 1));
   };
+
+  if (suspended) {
+    return (
+      <>
+        <Head>
+          <title>Restaurant Suspended • RestaurantOS</title>
+        </Head>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+          <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-amber-200 px-6 py-8 text-center">
+            <h1 className="text-xl font-semibold text-amber-900 mb-2">Restaurant temporarily unavailable</h1>
+            <p className="text-sm text-amber-800">
+              This restaurant&apos;s account is currently suspended because the subscription is inactive
+              or expired. Please check back later or contact the restaurant directly.
+            </p>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -427,6 +446,22 @@ export async function getServerSideProps({ params }) {
       if (res.status === 404) {
         return { notFound: true };
       }
+
+      const body = await res.json().catch(() => ({}));
+      const message = body.message || "";
+      const lower = message.toLowerCase();
+
+      if (lower.includes("subscription inactive") || lower.includes("subscription expired")) {
+        return {
+          props: {
+            restaurant: null,
+            menu: [],
+            categories: [],
+            suspended: true
+          }
+        };
+      }
+
       throw new Error(`Failed to load restaurant menu: ${res.status}`);
     }
 
@@ -437,6 +472,7 @@ export async function getServerSideProps({ params }) {
         restaurant: data.restaurant || null,
         menu: data.menu || [],
         categories: data.categories || [],
+        suspended: false
       },
     };
   } catch (error) {

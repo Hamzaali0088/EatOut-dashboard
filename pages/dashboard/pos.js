@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "../../components/layout/AdminLayout";
-import { getMenu } from "../../lib/apiClient";
+import { getMenu, SubscriptionInactiveError } from "../../lib/apiClient";
 import { ShoppingCart, Plus, Minus, Trash2, Receipt, CreditCard, Banknote } from "lucide-react";
 
 export default function POSPage() {
@@ -11,6 +11,8 @@ export default function POSPage() {
   const [customerName, setCustomerName] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("CASH");
   const [showCheckout, setShowCheckout] = useState(false);
+  const [suspended, setSuspended] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     loadMenu();
@@ -21,7 +23,12 @@ export default function POSPage() {
       const data = await getMenu();
       setMenu(data);
     } catch (err) {
-      console.error("Failed to load menu:", err);
+      if (err instanceof SubscriptionInactiveError) {
+        setSuspended(true);
+      } else {
+        console.error("Failed to load menu:", err);
+        setError(err.message || "Failed to load menu");
+      }
     }
   }
 
@@ -78,7 +85,12 @@ export default function POSPage() {
   };
 
   return (
-    <AdminLayout title="Point of Sale">
+    <AdminLayout title="Point of Sale" suspended={suspended}>
+      {error && (
+        <div className="mb-4 rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-xs text-red-700">
+          {error}
+        </div>
+      )}
       <div className="grid gap-4 lg:grid-cols-[1fr_400px] h-[calc(100vh-180px)]">
         {/* Menu Items Section */}
         <div className="flex flex-col bg-white dark:bg-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-xl overflow-hidden">

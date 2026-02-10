@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import AdminLayout from "../../components/layout/AdminLayout";
 import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
-import { getSalesReport } from "../../lib/apiClient";
+import { getSalesReport, SubscriptionInactiveError } from "../../lib/apiClient";
 import { Filter } from "lucide-react";
 
 export default function HistoryPage() {
@@ -16,13 +16,25 @@ export default function HistoryPage() {
     topItems: []
   });
 
+  const [suspended, setSuspended] = useState(false);
+  const [error, setError] = useState("");
+
   async function loadReport(input = filters) {
-    const data = await getSalesReport(input);
-    setReport({
-      totalRevenue: data.totalRevenue || 0,
-      totalOrders: data.totalOrders || 0,
-      topItems: data.topItems || []
-    });
+    try {
+      const data = await getSalesReport(input);
+      setReport({
+        totalRevenue: data.totalRevenue || 0,
+        totalOrders: data.totalOrders || 0,
+        topItems: data.topItems || []
+      });
+    } catch (err) {
+      if (err instanceof SubscriptionInactiveError) {
+        setSuspended(true);
+      } else {
+        console.error("Failed to load sales report:", err);
+        setError(err.message || "Failed to load sales report");
+      }
+    }
   }
 
   useEffect(() => {
@@ -42,7 +54,12 @@ export default function HistoryPage() {
   }
 
   return (
-    <AdminLayout title="Sales & Inventory Reports">
+    <AdminLayout title="Sales & Inventory Reports" suspended={suspended}>
+      {error && (
+        <div className="mb-4 rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-xs text-red-700">
+          {error}
+        </div>
+      )}
       <Card
         title="Filters"
         description="View daily or monthly performance and top‑selling items."

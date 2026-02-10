@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import AdminLayout from "../../components/layout/AdminLayout";
 import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
-import { getInventory, createInventoryItem, updateInventoryItem } from "../../lib/apiClient";
+import { getInventory, createInventoryItem, updateInventoryItem, SubscriptionInactiveError } from "../../lib/apiClient";
 
 export default function InventoryPage() {
   const [items, setItems] = useState([]);
@@ -13,8 +13,23 @@ export default function InventoryPage() {
     lowStockThreshold: ""
   });
 
+  const [suspended, setSuspended] = useState(false);
+  const [error, setError] = useState("");
+
   useEffect(() => {
-    getInventory().then(setItems);
+    (async () => {
+      try {
+        const data = await getInventory();
+        setItems(data);
+      } catch (err) {
+        if (err instanceof SubscriptionInactiveError) {
+          setSuspended(true);
+        } else {
+          console.error("Failed to load inventory:", err);
+          setError(err.message || "Failed to load inventory");
+        }
+      }
+    })();
   }, []);
 
   async function handleCreate(e) {
@@ -43,7 +58,12 @@ export default function InventoryPage() {
   }
 
   return (
-    <AdminLayout title="Inventory Management">
+    <AdminLayout title="Inventory Management" suspended={suspended}>
+      {error && (
+        <div className="mb-4 rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-xs text-red-700">
+          {error}
+        </div>
+      )}
       <div className="grid gap-4 md:grid-cols-[minmax(0,1.1fr)_minmax(0,2fr)]">
         <Card
           title="Add inventory item"

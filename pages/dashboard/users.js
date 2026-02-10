@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import AdminLayout from "../../components/layout/AdminLayout";
 import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
-import { getUsers, createUser, updateUser, deleteUser } from "../../lib/apiClient";
+import { getUsers, createUser, updateUser, deleteUser, SubscriptionInactiveError } from "../../lib/apiClient";
 import { UserPlus, Trash2, Edit3, Shield, UserCircle2 } from "lucide-react";
 
 const ROLE_OPTIONS = [
@@ -21,9 +21,23 @@ export default function UsersPage() {
     role: "employee"
   });
   const [loading, setLoading] = useState(false);
+  const [suspended, setSuspended] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    getUsers().then(setUsers);
+    (async () => {
+      try {
+        const data = await getUsers();
+        setUsers(data);
+      } catch (err) {
+        if (err instanceof SubscriptionInactiveError) {
+          setSuspended(true);
+        } else {
+          console.error("Failed to load users:", err);
+          setError(err.message || "Failed to load users");
+        }
+      }
+    })();
   }, []);
 
   function resetForm() {
@@ -114,7 +128,12 @@ export default function UsersPage() {
   }
 
   return (
-    <AdminLayout title="User Management">
+    <AdminLayout title="User Management" suspended={suspended}>
+      {error && (
+        <div className="mb-4 rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-xs text-red-700">
+          {error}
+        </div>
+      )}
       <div className="grid gap-4 md:grid-cols-[minmax(0,1.3fr)_minmax(0,2fr)]">
         <Card
           title={form.id ? "Edit User" : "Create User"}
