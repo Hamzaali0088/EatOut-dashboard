@@ -26,6 +26,7 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(false);
   const [suspended, setSuspended] = useState(false);
   const [error, setError] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { confirm } = useConfirmDialog();
 
   useEffect(() => {
@@ -62,6 +63,7 @@ export default function UsersPage() {
       password: "",
       role: user.role
     });
+    setIsModalOpen(true);
   }
 
   async function handleSubmit(e) {
@@ -89,6 +91,7 @@ export default function UsersPage() {
         setUsers(prev => [created, ...prev]);
       }
       resetForm();
+      setIsModalOpen(false);
     } finally {
       setLoading(false);
     }
@@ -115,7 +118,7 @@ export default function UsersPage() {
       "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border";
     if (role === "admin") {
       return (
-        <span className={`${base} border-red-500/60 bg-red-500/10 text-red-300`}>
+        <span className={`${base} border-red-500/60 bg-red-500/10 text-red-700`}>
           <Shield className="w-3 h-3" />
           Admin
         </span>
@@ -124,7 +127,7 @@ export default function UsersPage() {
     if (role === "product_manager") {
       return (
         <span
-          className={`${base} border-amber-400/60 bg-amber-400/10 text-amber-200`}
+          className={`${base} border-amber-400/60 bg-amber-400/10 text-amber-700`}
         >
           <UserCircle2 className="w-3 h-3" />
           Product manager
@@ -134,7 +137,7 @@ export default function UsersPage() {
     if (role === "cashier") {
       return (
         <span
-          className={`${base} border-emerald-400/60 bg-emerald-400/10 text-emerald-200`}
+          className={`${base} border-emerald-400/60 bg-emerald-400/10 text-emerald-700`}
         >
           <UserCircle2 className="w-3 h-3" />
           Cashier
@@ -144,7 +147,7 @@ export default function UsersPage() {
     if (role === "manager") {
       return (
         <span
-          className={`${base} border-sky-400/60 bg-sky-400/10 text-sky-200`}
+          className={`${base} border-sky-400/60 bg-sky-400/10 text-sky-700`}
         >
           <UserCircle2 className="w-3 h-3" />
           Manager
@@ -154,7 +157,7 @@ export default function UsersPage() {
     if (role === "kitchen_staff") {
       return (
         <span
-          className={`${base} border-lime-400/60 bg-lime-400/10 text-lime-200`}
+          className={`${base} border-lime-400/60 bg-lime-400/10 text-lime-700`}
         >
           <UserCircle2 className="w-3 h-3" />
           Kitchen staff
@@ -177,86 +180,24 @@ export default function UsersPage() {
           {error}
         </div>
       )}
-      <div className="grid gap-4 md:grid-cols-[minmax(0,1.3fr)_minmax(0,2fr)]">
-        <Card
-          title={form.id ? "Edit User" : "Create User"}
-          description="Invite admins and employees or register customers manually."
-        >
-          <form onSubmit={handleSubmit} className="space-y-3 text-xs" autoComplete="off">
-            <div className="space-y-1">
-              <label className="text-gray-700 dark:text-neutral-300 text-[11px]">Name</label>
-              <input
-                type="text"
-                autoComplete="off"
-                value={form.name}
-                onChange={e => setForm(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="Full name"
-                className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-xs text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-gray-700 dark:text-neutral-300 text-[11px]">Email</label>
-              <input
-                type="email"
-                autoComplete="off"
-                value={form.email}
-                onChange={e => setForm(prev => ({ ...prev, email: e.target.value }))}
-                placeholder="name@example.com"
-                className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-xs text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-gray-700 dark:text-neutral-300 text-[11px]">
-                {form.id ? "Password (optional, to reset)" : "Password"}
-              </label>
-              <input
-                type="password"
-                autoComplete="new-password"
-                value={form.password}
-                onChange={e =>
-                  setForm(prev => ({ ...prev, password: e.target.value }))
-                }
-                placeholder={form.id ? "Leave blank to keep existing" : "Minimum 6 characters"}
-                className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-xs text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-gray-700 dark:text-neutral-300 text-[11px]">Role</label>
-              <select
-                value={form.role}
-                onChange={e => setForm(prev => ({ ...prev, role: e.target.value }))}
-                className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-xs text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
-              >
-                {ROLE_OPTIONS.map(r => (
-                  <option key={r.value} value={r.value}>
-                    {r.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="flex gap-2 pt-2">
-              <Button type="submit" className="gap-1" disabled={loading}>
-                <UserPlus className="w-3 h-3" />
-                {form.id ? "Save changes" : "Create user"}
-              </Button>
-              {form.id && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={resetForm}
-                  className="text-neutral-300"
-                >
-                  Cancel edit
-                </Button>
-              )}
-            </div>
-          </form>
-        </Card>
-
+      <div className="grid gap-4">
         <Card
           title="Existing Users"
           description="View and manage all users with system access."
         >
+          <div className="flex justify-end mb-3">
+            <Button
+              type="button"
+              className="gap-2"
+              onClick={() => {
+                resetForm();
+                setIsModalOpen(true);
+              }}
+            >
+              <UserPlus className="w-3 h-3" />
+              Create user
+            </Button>
+          </div>
           <div className="max-h-96 overflow-y-auto text-xs">
             <table className="w-full text-xs">
               <thead className="text-[11px] uppercase text-gray-500 border-b border-gray-200">
@@ -319,6 +260,95 @@ export default function UsersPage() {
           </div>
         </Card>
       </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
+          <div className="w-full max-w-md rounded-2xl bg-white dark:bg-neutral-950 border border-gray-200 dark:border-neutral-800 p-5 text-xs">
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
+              {form.id ? "Edit User" : "Create User"}
+            </h2>
+            <p className="text-[11px] text-neutral-500 mb-4">
+              Invite admins and employees or register customers manually.
+            </p>
+            <form onSubmit={handleSubmit} className="space-y-3" autoComplete="off">
+              <div className="space-y-1">
+                <label className="text-gray-700 dark:text-neutral-300 text-[11px]">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  autoComplete="off"
+                  value={form.name}
+                  onChange={e => setForm(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="Full name"
+                  className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-xs text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-gray-700 dark:text-neutral-300 text-[11px]">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  autoComplete="off"
+                  value={form.email}
+                  onChange={e => setForm(prev => ({ ...prev, email: e.target.value }))}
+                  placeholder="name@example.com"
+                  className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-xs text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-gray-700 dark:text-neutral-300 text-[11px]">
+                  {form.id ? "Password (optional, to reset)" : "Password"}
+                </label>
+                <input
+                  type="password"
+                  autoComplete="new-password"
+                  value={form.password}
+                  onChange={e =>
+                    setForm(prev => ({ ...prev, password: e.target.value }))
+                  }
+                  placeholder={form.id ? "Leave blank to keep existing" : "Minimum 6 characters"}
+                  className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-xs text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-gray-700 dark:text-neutral-300 text-[11px]">
+                  Role
+                </label>
+                <select
+                  value={form.role}
+                  onChange={e => setForm(prev => ({ ...prev, role: e.target.value }))}
+                  className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-xs text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
+                >
+                  {ROLE_OPTIONS.map(r => (
+                    <option key={r.value} value={r.value}>
+                      {r.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="text-neutral-400"
+                  onClick={() => {
+                    resetForm();
+                    setIsModalOpen(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" className="gap-1" disabled={loading}>
+                  <UserPlus className="w-3 h-3" />
+                  {form.id ? "Save changes" : "Create user"}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }

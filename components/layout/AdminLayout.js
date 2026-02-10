@@ -12,7 +12,14 @@ import {
   Factory,
   Settings2,
   Sun,
-  Moon
+  Moon,
+  ClipboardList,
+  BarChart3,
+  UserCog,
+  ChefHat,
+  MapPin,
+  UserCircle2,
+  ChevronRight
 } from "lucide-react";
 import { getToken } from "../../lib/apiClient";
 import { useTheme } from "../../contexts/ThemeContext";
@@ -36,6 +43,16 @@ const superNav = [
   { href: "/dashboard/super/settings", label: "System Settings", icon: Settings2 }
 ];
 
+// Manager-focused navigation, inspired by Nimbus-style layout
+const managerNav = [
+  { path: "/dashboard/overview", label: "Dashboard", icon: LayoutDashboard },
+  { path: "/dashboard/orders", label: "Order Management", icon: ClipboardList },
+  { path: "/dashboard/day-report", label: "Day Report", icon: BarChart3 },
+  { path: "/dashboard/users", label: "User Management", icon: Users },
+  { path: "/dashboard/branches", label: "Branches", icon: MapPin },
+  { path: "/dashboard/profile", label: "Profile", icon: UserCircle2 }
+];
+
 function decodeRoleFromToken(token) {
   if (!token || typeof window === "undefined") return null;
   try {
@@ -54,6 +71,7 @@ function decodeRoleFromToken(token) {
 export default function AdminLayout({ title, children, suspended = false }) {
   const router = useRouter();
   const [role, setRole] = useState(null);
+  const [collapsed, setCollapsed] = useState(false);
   const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
@@ -62,7 +80,8 @@ export default function AdminLayout({ title, children, suspended = false }) {
     setRole(r);
   }, []);
 
-  const navItems = role === "super_admin" ? superNav : tenantNav;
+  const navItems =
+    role === "super_admin" ? superNav : role === "manager" ? managerNav : tenantNav;
   const roleLabel =
     role === "super_admin"
       ? "Super Admin"
@@ -90,21 +109,40 @@ export default function AdminLayout({ title, children, suspended = false }) {
     router.push(target);
   }
 
+  const sidebarWidthClass = collapsed ? "w-16" : "w-56";
+
   return (
-    <div className="min-h-screen bg-white dark:bg-black flex text-gray-900 dark:text-white">
-      <aside className="hidden md:flex w-64 flex-col border-r border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-950">
-        <div className="px-6 py-5 border-b border-gray-200 dark:border-neutral-800 flex items-center gap-2">
+    <div className="h-screen overflow-hidden bg-white dark:bg-black flex text-gray-900 dark:text-white text-sm">
+      <aside
+        className={`hidden md:flex ${sidebarWidthClass} flex-col border-r border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-950 relative transition-[width] duration-300 ease-in-out`}
+      >
+        <div className="px-4 py-5 border-b border-gray-200 dark:border-neutral-800 flex items-center gap-2 justify-between">
           <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white font-bold">
             EO
           </span>
-          <div>
-            <div className="font-semibold tracking-tight text-gray-900 dark:text-white">RestaurantOS</div>
-            <div className="text-xs text-gray-500 dark:text-neutral-400">
-              {role === "super_admin" ? "Platform Console" : "Restaurant Dashboard"}
+          {!collapsed && (
+            <div className="flex-1 min-w-0 ml-2">
+              <div className="font-semibold text-base tracking-tight text-gray-900  dark:text-white truncate">
+                RestaurantOS
+              </div>
+              <div className="text-xs text-gray-500 dark:text-neutral-400 truncate">
+                {role === "super_admin" ? "Platform Console" : "Restaurant Dashboard"}
+              </div>
             </div>
-          </div>
+          )}
         </div>
-        <nav className="flex-1 p-4 space-y-1">
+        {/* Collapse / expand chevron on right border */}
+        <button
+          type="button"
+          onClick={() => setCollapsed(prev => !prev)}
+          className="hidden md:flex absolute top-16 -right-3 h-7 w-7 items-center justify-center rounded-full bg-white dark:bg-neutral-900 shadow-md border border-gray-200 dark:border-neutral-800 text-gray-500 hover:bg-gray-50 dark:hover:bg-neutral-800 transition-transform duration-200"
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          <ChevronRight
+            className={`w-4 h-4 transition-transform ${collapsed ? "rotate-180" : ""}`}
+          />
+        </button>
+        <nav className="flex-1 p-3 space-y-1">
           {navItems.map(item => {
             // Super admin nav uses absolute hrefs
             const href =
@@ -122,7 +160,7 @@ export default function AdminLayout({ title, children, suspended = false }) {
                   className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-400 dark:text-neutral-600 bg-gray-100/60 dark:bg-neutral-900/60 cursor-not-allowed"
                 >
                   <Icon className="w-4 h-4" />
-                  {item.label}
+                  {!collapsed && <span>{item.label}</span>}
                 </div>
               );
             }
@@ -131,14 +169,14 @@ export default function AdminLayout({ title, children, suspended = false }) {
               <Link
                 key={href}
                 href={href}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
                   isActive
                     ? "bg-primary text-white"
                     : "text-gray-700 dark:text-neutral-300 hover:bg-gray-100 dark:hover:bg-neutral-900 hover:text-gray-900 dark:hover:text-white"
                 }`}
               >
                 <Icon className="w-4 h-4" />
-                {item.label}
+                {!collapsed && <span>{item.label}</span>}
               </Link>
             );
           })}
@@ -149,7 +187,7 @@ export default function AdminLayout({ title, children, suspended = false }) {
             className="w-full inline-flex items-center justify-center gap-2 text-sm font-medium px-3 py-2 rounded-lg bg-gray-100 dark:bg-neutral-900 hover:bg-gray-200 dark:hover:bg-neutral-800 text-red-600 dark:text-red-400"
           >
             <LogOut className="w-4 h-4" />
-            Logout
+            {!collapsed && <span>Logout</span>}
           </button>
         </div>
       </aside>
@@ -218,8 +256,8 @@ export default function AdminLayout({ title, children, suspended = false }) {
           </div>
         </header>
 
-        <main className="relative flex-1 px-4 md:px-8 py-6 overflow-y-auto bg-white dark:bg-black">
-          <div className="max-w-6xl mx-auto">{!suspended && children}</div>
+        <main className="relative flex-1 px-6 py-6 overflow-y-auto bg-white dark:bg-black">
+          {!suspended && children}
 
           {suspended && role !== "super_admin" && (
             <>
