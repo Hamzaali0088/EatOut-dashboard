@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import { login } from "../lib/apiClient";
-import { ShieldCheck, Loader2 } from "lucide-react";
+import { ShieldCheck, Loader2, Eye, EyeOff } from "lucide-react";
+
+const ALLOWED_ROLES = ["super_admin", "restaurant_admin", "staff"];
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("admin@eatout.com");
-  const [password, setPassword] = useState("password123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -16,12 +20,39 @@ export default function LoginPage() {
     setError("");
 
     try {
-      await login(email, password);
-      const from = router.query.from || "/dashboard/overview";
-      router.push(from);
+      const data = await login(email, password);
+      const user = data.user || data;
+
+      if (!user || !ALLOWED_ROLES.includes(user.role)) {
+        setError("Invalid credentials or not an admin/staff user");
+        setLoading(false);
+        return;
+      }
+
+      // Decide target dashboard route
+      let target = "/dashboard/overview";
+      const fromQuery = router.query.from;
+
+      if (typeof fromQuery === "string" && fromQuery.startsWith("/dashboard")) {
+        target = fromQuery;
+      } else if (user.role === "super_admin") {
+        target = "/dashboard/super/overview";
+      } else {
+        target = "/dashboard/overview";
+      }
+
+      // Persist auth info for client-side use (e.g. showing name/role)
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem(
+          "restaurantos_auth",
+          JSON.stringify({ user, token: data.token || null })
+        );
+      }
+
+      // Navigate to dashboard (keep loading true during navigation)
+      window.location.href = target;
     } catch (err) {
       setError(err.message || "Login failed");
-    } finally {
       setLoading(false);
     }
   }
@@ -64,13 +95,23 @@ export default function LoginPage() {
 
           <div className="space-y-1">
             <label className="text-xs text-neutral-300">Password</label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg bg-neutral-900 border border-neutral-700 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="w-full px-3 py-2 pr-10 rounded-lg bg-neutral-900 border border-neutral-700 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-neutral-400 hover:text-neutral-200 rounded"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
           <button
@@ -92,9 +133,17 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="mt-4 text-[11px] text-neutral-500">
-          Demo credentials: <span className="text-neutral-300">admin@eatout.com</span> /{" "}
-          <span className="text-neutral-300">password123</span>
+        <div className="mt-6 text-center">
+          <p className="text-xs text-neutral-400">
+            Don't have an account?{" "}
+            <Link href="/signup" className="text-primary hover:underline font-medium">
+              Sign up as a restaurant owner
+            </Link>
+          </p>
+        </div>
+
+        <p className="mt-4 text-[11px] text-neutral-500 text-center">
+          Use your RestaurantOS credentials (super_admin, restaurant_admin, or staff).
         </p>
       </div>
     </div>

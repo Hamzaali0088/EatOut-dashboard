@@ -2,81 +2,55 @@ import { useEffect, useState } from "react";
 import AdminLayout from "../../components/layout/AdminLayout";
 import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
-import StatusBadge from "../../components/ui/StatusBadge";
-import { getOrderHistory } from "../../lib/apiClient";
+import { getSalesReport } from "../../lib/apiClient";
 import { Filter } from "lucide-react";
-
-const STATUS_OPTIONS = [
-  "ALL",
-  "PENDING",
-  "CONFIRMED",
-  "PREPARING",
-  "OUT_FOR_DELIVERY",
-  "COMPLETED",
-  "CANCELLED"
-];
 
 export default function HistoryPage() {
   const [filters, setFilters] = useState({
-    status: "ALL",
     from: "",
     to: ""
   });
-  const [orders, setOrders] = useState([]);
+  const [report, setReport] = useState({
+    totalRevenue: 0,
+    totalOrders: 0,
+    topItems: []
+  });
 
-  async function loadHistory(newFilters = filters) {
-    const data = await getOrderHistory(newFilters);
-    setOrders(data);
+  async function loadReport(input = filters) {
+    const data = await getSalesReport(input);
+    setReport({
+      totalRevenue: data.totalRevenue || 0,
+      totalOrders: data.totalOrders || 0,
+      topItems: data.topItems || []
+    });
   }
 
   useEffect(() => {
-    loadHistory();
+    loadReport();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function handleApplyFilters(e) {
     e.preventDefault();
-    await loadHistory(filters);
+    await loadReport(filters);
   }
 
   function handleResetFilters() {
-    const reset = { status: "ALL", from: "", to: "" };
+    const reset = { from: "", to: "" };
     setFilters(reset);
-    loadHistory(reset);
+    loadReport(reset);
   }
 
   return (
-    <AdminLayout title="Order History">
+    <AdminLayout title="Sales & Inventory Reports">
       <Card
         title="Filters"
-        description="Narrow down historical orders by status and date range."
+        description="View daily or monthly performance and top‑selling items."
       >
         <form
           onSubmit={handleApplyFilters}
-          className="grid gap-3 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_auto_auto] items-end text-xs mb-4"
+          className="grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto_auto] items-end text-xs mb-4"
         >
-          <div className="space-y-1">
-            <label className="text-neutral-300 text-[11px]">Status</label>
-            <select
-              value={filters.status}
-              onChange={e =>
-                setFilters(prev => ({ ...prev, status: e.target.value }))
-              }
-              className="w-full px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-700 text-xs outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
-            >
-              {STATUS_OPTIONS.map(s => (
-                <option key={s} value={s}>
-                  {s === "ALL"
-                    ? "All statuses"
-                    : s
-                        .toLowerCase()
-                        .replace(/_/g, " ")
-                        .replace(/(^|\s)\S/g, c => c.toUpperCase())}
-                </option>
-              ))}
-            </select>
-          </div>
-
           <div className="space-y-1">
             <label className="text-neutral-300 text-[11px]">From</label>
             <input
@@ -115,43 +89,57 @@ export default function HistoryPage() {
           </Button>
         </form>
 
+        <div className="grid gap-4 md:grid-cols-3 mb-4 text-xs">
+          <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-4">
+            <p className="text-[11px] text-neutral-400 mb-1">Total revenue</p>
+            <p className="text-xl font-semibold">
+              PKR {report.totalRevenue.toFixed(0)}
+            </p>
+          </div>
+          <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-4">
+            <p className="text-[11px] text-neutral-400 mb-1">Total orders</p>
+            <p className="text-xl font-semibold">{report.totalOrders}</p>
+          </div>
+          <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-4">
+            <p className="text-[11px] text-neutral-400 mb-1">Average ticket</p>
+            <p className="text-xl font-semibold">
+              PKR{" "}
+              {report.totalOrders
+                ? Math.round(report.totalRevenue / report.totalOrders)
+                : 0}
+            </p>
+          </div>
+        </div>
+
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead className="text-[11px] uppercase text-neutral-500 border-b border-neutral-800">
               <tr>
-                <th className="py-2 text-left">Order</th>
-                <th className="py-2 text-left">Customer</th>
-                <th className="py-2 text-left">Status</th>
-                <th className="py-2 text-right">Total</th>
-                <th className="py-2 text-left">Date</th>
+                <th className="py-2 text-left">Item</th>
+                <th className="py-2 text-right">Quantity sold</th>
+                <th className="py-2 text-right">Revenue</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-900">
-              {orders.map(order => (
-                <tr key={order.id} className="hover:bg-neutral-950/60">
+              {report.topItems.map(item => (
+                <tr key={item.menuItemId} className="hover:bg-neutral-950/60">
                   <td className="py-3 pr-3">
-                    <div className="font-medium text-neutral-100">{order.id}</div>
+                    <div className="font-medium text-neutral-100">{item.name}</div>
                   </td>
-                  <td className="py-3 pr-3">{order.customerName}</td>
-                  <td className="py-3 pr-3">
-                    <StatusBadge status={order.status} />
-                  </td>
-                  <td className="py-3 pr-3 text-right font-semibold">
-                    ${order.total.toFixed(2)}
-                  </td>
-                  <td className="py-3 pr-3 text-neutral-400">
-                    {new Date(order.createdAt).toLocaleString()}
+                  <td className="py-3 pr-3 text-right">{item.quantity}</td>
+                  <td className="py-3 pr-3 text-right">
+                    PKR {item.revenue?.toFixed ? item.revenue.toFixed(0) : item.revenue}
                   </td>
                 </tr>
               ))}
 
-              {orders.length === 0 && (
+              {report.topItems.length === 0 && (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={3}
                     className="py-6 text-center text-xs text-neutral-500"
                   >
-                    No orders match your filters.
+                    No sales data for this range yet.
                   </td>
                 </tr>
               )}

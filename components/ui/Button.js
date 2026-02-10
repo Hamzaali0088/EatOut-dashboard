@@ -9,9 +9,9 @@ export default function Button({
     "inline-flex items-center justify-center px-3 py-1.5 rounded-lg text-xs font-medium transition-colors focus:outline-none focus:ring-1 focus:ring-primary/60 disabled:opacity-50 disabled:cursor-not-allowed";
 
   const variants = {
-    primary: "bg-primary text-black hover:bg-red-500",
-    ghost: "bg-transparent border border-neutral-700 text-neutral-200 hover:bg-neutral-900",
-    subtle: "bg-neutral-900 text-neutral-100 hover:bg-neutral-800"
+    primary: "bg-primary text-white hover:bg-red-500",
+    ghost: "bg-transparent border border-gray-300 dark:border-neutral-700 text-gray-700 dark:text-neutral-200 hover:bg-gray-100 dark:hover:bg-neutral-900",
+    subtle: "bg-gray-100 dark:bg-neutral-900 text-gray-900 dark:text-neutral-100 hover:bg-gray-200 dark:hover:bg-neutral-800"
   };
 
   return (

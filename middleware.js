@@ -19,7 +19,8 @@ export async function middleware(request) {
 
   const payload = await verifyJwt(token);
 
-  if (!payload || payload.role !== "admin") {
+  const allowedRoles = ["super_admin", "restaurant_admin", "staff"];
+  if (!payload || !allowedRoles.includes(payload.role)) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
