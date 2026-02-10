@@ -52,26 +52,26 @@ export default function HistoryPage() {
           className="grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto_auto] items-end text-xs mb-4"
         >
           <div className="space-y-1">
-            <label className="text-neutral-300 text-[11px]">From</label>
+            <label className="text-gray-700 dark:text-neutral-300 text-[11px]">From</label>
             <input
               type="date"
               value={filters.from}
               onChange={e =>
                 setFilters(prev => ({ ...prev, from: e.target.value }))
               }
-              className="w-full px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-700 text-xs outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
+              className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-xs text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
             />
           </div>
 
           <div className="space-y-1">
-            <label className="text-neutral-300 text-[11px]">To</label>
+            <label className="text-gray-700 dark:text-neutral-300 text-[11px]">To</label>
             <input
               type="date"
               value={filters.to}
               onChange={e =>
                 setFilters(prev => ({ ...prev, to: e.target.value }))
               }
-              className="w-full px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-700 text-xs outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
+              className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-xs text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
             />
           </div>
 
@@ -90,19 +90,19 @@ export default function HistoryPage() {
         </form>
 
         <div className="grid gap-4 md:grid-cols-3 mb-4 text-xs">
-          <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-4">
-            <p className="text-[11px] text-neutral-400 mb-1">Total revenue</p>
-            <p className="text-xl font-semibold">
+          <div className="rounded-xl border border-gray-200 bg-white p-4">
+            <p className="text-[11px] text-gray-600 mb-1">Total revenue</p>
+            <p className="text-xl font-semibold text-gray-900">
               PKR {report.totalRevenue.toFixed(0)}
             </p>
           </div>
-          <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-4">
-            <p className="text-[11px] text-neutral-400 mb-1">Total orders</p>
-            <p className="text-xl font-semibold">{report.totalOrders}</p>
+          <div className="rounded-xl border border-gray-200 bg-white p-4">
+            <p className="text-[11px] text-gray-600 mb-1">Total orders</p>
+            <p className="text-xl font-semibold text-gray-900">{report.totalOrders}</p>
           </div>
-          <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-4">
-            <p className="text-[11px] text-neutral-400 mb-1">Average ticket</p>
-            <p className="text-xl font-semibold">
+          <div className="rounded-xl border border-gray-200 bg-white p-4">
+            <p className="text-[11px] text-gray-600 mb-1">Average ticket</p>
+            <p className="text-xl font-semibold text-gray-900">
               PKR{" "}
               {report.totalOrders
                 ? Math.round(report.totalRevenue / report.totalOrders)
@@ -120,11 +120,11 @@ export default function HistoryPage() {
                 <th className="py-2 text-right">Revenue</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-900">
+            <tbody className="divide-y divide-neutral-200">
               {report.topItems.map(item => (
-                <tr key={item.menuItemId} className="hover:bg-neutral-950/60">
+                <tr key={item.menuItemId} className="hover:bg-gray-50">
                   <td className="py-3 pr-3">
-                    <div className="font-medium text-neutral-100">{item.name}</div>
+                    <div className="font-medium text-gray-900">{item.name}</div>
                   </td>
                   <td className="py-3 pr-3 text-right">{item.quantity}</td>
                   <td className="py-3 pr-3 text-right">

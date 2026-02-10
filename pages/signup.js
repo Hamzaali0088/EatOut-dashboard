@@ -31,6 +31,7 @@ export default function SignupPage() {
     try {
       const data = await registerRestaurant(formData);
       const user = data.user;
+      const slug = data.restaurant?.subdomain;
 
       // Store auth data
       if (typeof window !== "undefined") {
@@ -40,8 +41,13 @@ export default function SignupPage() {
         );
       }
 
-      // Redirect to dashboard
-      window.location.href = "/dashboard/overview";
+      // Redirect to tenant-specific dashboard
+      if (slug) {
+        window.location.href = `/r/${encodeURIComponent(slug)}/dashboard`;
+      } else {
+        // Fallback: legacy dashboard if slug missing
+        window.location.href = "/dashboard/overview";
+      }
     } catch (err) {
       setError(err.message || "Registration failed");
       setLoading(false);
@@ -49,20 +55,20 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center px-4 py-8">
-      <div className="w-full max-w-xl bg-neutral-950 border border-neutral-800 rounded-2xl p-8 shadow-xl">
+    <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center px-4 py-8">
+      <div className="w-full max-w-xl bg-white dark:bg-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-2xl p-8 shadow-xl">
         <div className="flex items-center gap-3 mb-6">
           <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center text-black font-bold text-lg">
             ROS
           </div>
           <div>
-            <div className="text-base font-semibold">RestaurantOS</div>
-            <div className="text-xs text-neutral-400">Start Your Free Trial</div>
+            <div className="text-base font-semibold text-gray-900 dark:text-white">RestaurantOS</div>
+            <div className="text-xs text-gray-500 dark:text-neutral-400">Start Your Free Trial</div>
           </div>
         </div>
 
-        <h1 className="text-2xl font-bold tracking-tight mb-2">Create Your Restaurant Account</h1>
-        <p className="text-sm text-neutral-400 mb-6">
+        <h1 className="text-2xl font-bold tracking-tight mb-2 text-gray-900 dark:text-white">Create Your Restaurant Account</h1>
+        <p className="text-sm text-gray-600 dark:text-neutral-400 mb-6">
           Get started with a 14-day free trial. No credit card required.
         </p>
 
@@ -74,14 +80,14 @@ export default function SignupPage() {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Restaurant Details */}
-          <div className="space-y-4 p-4 bg-neutral-900/50 border border-neutral-800 rounded-xl">
-            <h3 className="text-sm font-semibold text-neutral-200 flex items-center gap-2">
+          <div className="space-y-4 p-4 bg-gray-50 dark:bg-neutral-900/50 border border-gray-200 dark:border-neutral-800 rounded-xl">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-neutral-200 flex items-center gap-2">
               <Store className="w-4 h-4" />
               Restaurant Details
             </h3>
             
             <div className="space-y-1">
-              <label className="text-xs text-neutral-300">Restaurant Name *</label>
+              <label className="text-xs text-gray-700 dark:text-neutral-300">Restaurant Name *</label>
               <input
                 type="text"
                 name="restaurantName"
@@ -89,12 +95,12 @@ export default function SignupPage() {
                 value={formData.restaurantName}
                 onChange={handleChange}
                 placeholder="e.g., Pizza Palace"
-                className="w-full px-3 py-2.5 rounded-lg bg-neutral-900 border border-neutral-700 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
+                className="w-full px-3 py-2.5 rounded-lg bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-sm text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs text-neutral-300">
+              <label className="text-xs text-gray-700 dark:text-neutral-300">
                 Subdomain * <span className="text-neutral-500">(yourname.restaurantos.com)</span>
               </label>
               <div className="flex items-center gap-2">
@@ -107,31 +113,31 @@ export default function SignupPage() {
                   placeholder="pizzapalace"
                   pattern="[a-z0-9-]+"
                   title="Only lowercase letters, numbers, and hyphens"
-                  className="flex-1 px-3 py-2.5 rounded-lg bg-neutral-900 border border-neutral-700 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
+                  className="flex-1 px-3 py-2.5 rounded-lg bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-sm text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
                 />
                 <span className="text-xs text-neutral-500">.restaurantos.com</span>
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs text-neutral-300">Phone (optional)</label>
+              <label className="text-xs text-gray-700 dark:text-neutral-300">Phone (optional)</label>
               <input
                 type="tel"
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder="+1 (555) 123-4567"
-                className="w-full px-3 py-2.5 rounded-lg bg-neutral-900 border border-neutral-700 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
+                className="w-full px-3 py-2.5 rounded-lg bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-sm text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
               />
             </div>
           </div>
 
           {/* Owner Details */}
-          <div className="space-y-4 p-4 bg-neutral-900/50 border border-neutral-800 rounded-xl">
-            <h3 className="text-sm font-semibold text-neutral-200">Your Account</h3>
+          <div className="space-y-4 p-4 bg-gray-50 dark:bg-neutral-900/50 border border-gray-200 dark:border-neutral-800 rounded-xl">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-neutral-200">Your Account</h3>
             
             <div className="space-y-1">
-              <label className="text-xs text-neutral-300">Your Name *</label>
+              <label className="text-xs text-gray-700 dark:text-neutral-300">Your Name *</label>
               <input
                 type="text"
                 name="ownerName"
@@ -139,12 +145,12 @@ export default function SignupPage() {
                 value={formData.ownerName}
                 onChange={handleChange}
                 placeholder="John Doe"
-                className="w-full px-3 py-2.5 rounded-lg bg-neutral-900 border border-neutral-700 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
+                className="w-full px-3 py-2.5 rounded-lg bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-sm text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs text-neutral-300">Email *</label>
+              <label className="text-xs text-gray-700 dark:text-neutral-300">Email *</label>
               <input
                 type="email"
                 name="email"
@@ -152,12 +158,12 @@ export default function SignupPage() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="you@example.com"
-                className="w-full px-3 py-2.5 rounded-lg bg-neutral-900 border border-neutral-700 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
+                className="w-full px-3 py-2.5 rounded-lg bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-sm text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs text-neutral-300">Password *</label>
+              <label className="text-xs text-gray-700 dark:text-neutral-300">Password *</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -167,7 +173,7 @@ export default function SignupPage() {
                   onChange={handleChange}
                   placeholder="Create a strong password"
                   minLength={6}
-                  className="w-full px-3 py-2.5 pr-10 rounded-lg bg-neutral-900 border border-neutral-700 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
+                  className="w-full px-3 py-2.5 pr-10 rounded-lg bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-sm text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
                 />
                 <button
                   type="button"
@@ -184,7 +190,7 @@ export default function SignupPage() {
           {/* Features List */}
           <div className="bg-primary/5 border border-primary/20 rounded-xl p-4">
             <h4 className="text-xs font-semibold text-primary mb-3">What's included in your trial:</h4>
-            <div className="space-y-2 text-xs text-neutral-300">
+            <div className="space-y-2 text-xs text-gray-700 dark:text-neutral-300">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
                 <span>Point of Sale (POS) system</span>
@@ -224,7 +230,7 @@ export default function SignupPage() {
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-xs text-neutral-400">
+          <p className="text-xs text-gray-600 dark:text-neutral-400">
             Already have an account?{" "}
             <Link href="/login" className="text-primary hover:underline font-medium">
               Sign in
@@ -232,7 +238,7 @@ export default function SignupPage() {
           </p>
         </div>
 
-        <p className="mt-4 text-[10px] text-neutral-600 text-center leading-relaxed">
+        <p className="mt-4 text-[10px] text-gray-500 dark:text-neutral-600 text-center leading-relaxed">
           By signing up, you agree to our Terms of Service and Privacy Policy.
           <br />
           Your 14-day trial starts immediately. Cancel anytime.

@@ -104,7 +104,7 @@ export default function MenuPage() {
               onChange={e =>
                 setCatForm(prev => ({ ...prev, description: e.target.value }))
               }
-              className="w-full px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-700 text-xs outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
+              className="w-full px-3 py-1.5 rounded-lg bg-gray-50 dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 text-xs text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
             />
           </form>
 

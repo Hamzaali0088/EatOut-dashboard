@@ -24,7 +24,7 @@ export default function OverviewPage() {
               <div className="text-2xl font-semibold">{stats.totalOrders}</div>
               <div className="text-xs text-neutral-400 mt-1">All-time orders</div>
             </div>
-            <div className="h-9 w-9 rounded-lg bg-neutral-900 flex items-center justify-center text-primary">
+            <div className="h-9 w-9 rounded-lg bg-gray-100 flex items-center justify-center text-primary">
               <ShoppingBag className="w-4 h-4" />
             </div>
           </div>
@@ -36,7 +36,7 @@ export default function OverviewPage() {
               <div className="text-2xl font-semibold">{stats.pendingOrders}</div>
               <div className="text-xs text-neutral-400 mt-1">Awaiting action</div>
             </div>
-            <div className="h-9 w-9 rounded-lg bg-neutral-900 flex items-center justify-center text-amber-400">
+            <div className="h-9 w-9 rounded-lg bg-gray-100 flex items-center justify-center text-amber-400">
               <Timer className="w-4 h-4" />
             </div>
           </div>
@@ -52,7 +52,7 @@ export default function OverviewPage() {
                 Completed order revenue
               </div>
             </div>
-            <div className="h-9 w-9 rounded-lg bg-neutral-900 flex items-center justify-center text-green-400">
+            <div className="h-9 w-9 rounded-lg bg-gray-100 flex items-center justify-center text-green-400">
               <DollarSign className="w-4 h-4" />
             </div>
           </div>
@@ -64,14 +64,14 @@ export default function OverviewPage() {
           title="Operations Snapshot"
           description="Track live service health and bottlenecks."
         >
-          <ul className="text-xs space-y-2 text-neutral-300">
+          <ul className="text-xs space-y-2 text-gray-600 dark:text-neutral-300">
             <li className="flex justify-between">
               <span>Average prep time</span>
-              <span className="font-medium text-neutral-100">18 min</span>
+              <span className="font-medium text-gray-900 dark:text-neutral-100">18 min</span>
             </li>
             <li className="flex justify-between">
               <span>Orders in kitchen</span>
-              <span className="font-medium text-neutral-100">
+              <span className="font-medium text-gray-900 dark:text-neutral-100">
                 {stats.pendingOrders}
               </span>
             </li>
@@ -86,7 +86,7 @@ export default function OverviewPage() {
           title="Admin Tips"
           description="Best practices for clean, safe operations."
         >
-          <ul className="text-xs list-disc list-inside text-neutral-300 space-y-2">
+          <ul className="text-xs list-disc list-inside text-gray-600 dark:text-neutral-300 space-y-2">
             <li>Always move orders forward in the status flow – never backwards.</li>
             <li>Review completed orders daily in Order History for anomalies.</li>
             <li>Keep menu availability updated to prevent guest disappointment.</li>

@@ -4,7 +4,11 @@ import { verifyJwt } from "./lib/auth";
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
 
-  if (!pathname.startsWith("/dashboard")) {
+  // Protect legacy platform dashboard and tenant dashboards
+  const isPlatformDashboard = pathname.startsWith("/dashboard");
+  const tenantDashboardMatch = pathname.match(/^\/r\/([^/]+)\/dashboard(\/.*)?$/);
+
+  if (!isPlatformDashboard && !tenantDashboardMatch) {
     return NextResponse.next();
   }
 
@@ -26,10 +30,21 @@ export async function middleware(request) {
     return NextResponse.redirect(url);
   }
 
+  // Optional: prevent cross-tenant access if JWT contains tenantSlug
+  if (tenantDashboardMatch && payload.tenantSlug) {
+    const slugFromPath = tenantDashboardMatch[1];
+    if (slugFromPath !== payload.tenantSlug) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/login";
+      url.searchParams.set("from", pathname);
+      return NextResponse.redirect(url);
+    }
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"]
+  matcher: ["/dashboard/:path*", "/r/:tenantSlug/dashboard/:path*"]
 };
 

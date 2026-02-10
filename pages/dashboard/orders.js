@@ -36,7 +36,7 @@ export default function OrdersPage() {
       >
         <div className="mt-3 overflow-x-auto">
           <table className="w-full text-xs">
-            <thead className="text-[11px] uppercase text-neutral-500 border-b border-neutral-800">
+            <thead className="text-[11px] uppercase text-gray-500 border-b border-gray-200">
               <tr>
                 <th className="py-2 text-left">Order</th>
                 <th className="py-2 text-left">Customer</th>
@@ -46,22 +46,22 @@ export default function OrdersPage() {
                 <th className="py-2 text-left">Next Step</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-900">
+            <tbody className="divide-y divide-gray-200">
               {orders.map(order => {
                 const nextStatuses = getNextStatuses(order.status);
                 const isTerminal =
                   order.status === "COMPLETED" || order.status === "CANCELLED";
 
                 return (
-                  <tr key={order.id} className="hover:bg-neutral-950/60">
+                  <tr key={order.id} className="hover:bg-gray-50">
                     <td className="py-3 pr-3">
-                      <div className="font-medium text-neutral-100">{order.id}</div>
-                      <div className="text-[11px] text-neutral-500">
+                      <div className="font-medium text-gray-900">{order.id}</div>
+                      <div className="text-[11px] text-gray-500">
                         {new Date(order.createdAt).toLocaleString()}
                       </div>
                     </td>
                     <td className="py-3 pr-3 align-top">{order.customerName}</td>
-                    <td className="py-3 pr-3 align-top text-neutral-300">
+                    <td className="py-3 pr-3 align-top text-gray-700">
                       <ul className="space-y-1">
                         {order.items.map((item, i) => (
                           <li key={i} className="flex justify-between gap-2">

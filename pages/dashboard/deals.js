@@ -28,20 +28,20 @@ export default function DealsPage() {
           {deals.map(deal => (
             <div
               key={deal.id}
-              className="flex items-center justify-between gap-3 p-3 rounded-lg bg-neutral-950 border border-neutral-800"
+              className="flex items-center justify-between gap-3 p-3 rounded-lg bg-white dark:bg-neutral-950 border border-gray-200 dark:border-neutral-800"
             >
               <div className="flex items-start gap-3">
                 <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                   <Percent className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="font-medium text-neutral-100 flex items-center gap-2">
+                  <div className="font-medium text-gray-900 dark:text-neutral-100 flex items-center gap-2">
                     {deal.name}
                     <span className="badge badge-info">
                       {deal.discountPercent}% OFF
                     </span>
                   </div>
-                  <p className="text-[11px] text-neutral-400 mt-1">
+                  <p className="text-[11px] text-gray-600 dark:text-neutral-400 mt-1">
                     {deal.description}
                   </p>
                 </div>

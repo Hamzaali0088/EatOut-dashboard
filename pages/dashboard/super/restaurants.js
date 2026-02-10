@@ -34,8 +34,8 @@ export default function SuperRestaurantsPage() {
         description="Manage tenant status: Trial, Active or Suspended."
       >
         <div className="max-h-[28rem] overflow-y-auto text-xs">
-          <table className="w-full text-xs">
-            <thead className="text-[11px] uppercase text-neutral-500 border-b border-neutral-800">
+            <table className="w-full text-xs">
+            <thead className="text-[11px] uppercase text-gray-500 border-b border-gray-200">
               <tr>
                 <th className="py-2 text-left">Restaurant</th>
                 <th className="py-2 text-left">Subdomain</th>
@@ -46,21 +46,21 @@ export default function SuperRestaurantsPage() {
                 <th className="py-2 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-900">
+            <tbody className="divide-y divide-gray-200">
               {restaurants.map(r => {
                 const sub = r.subscription || {};
                 const website = r.website || {};
                 return (
-                  <tr key={r.id} className="hover:bg-neutral-950/60">
+                  <tr key={r.id} className="hover:bg-gray-50">
                     <td className="py-3 pr-3">
-                      <div className="font-medium text-neutral-100">
+                      <div className="font-medium text-gray-900">
                         {website.name || "Untitled restaurant"}
                       </div>
                     </td>
-                    <td className="py-3 pr-3 text-neutral-400">
+                    <td className="py-3 pr-3 text-gray-700">
                       {website.subdomain || "—"}
                     </td>
-                    <td className="py-3 pr-3 text-neutral-300">
+                    <td className="py-3 pr-3 text-gray-700">
                       {sub.plan || "ESSENTIAL"}
                     </td>
                     <td className="py-3 pr-3">

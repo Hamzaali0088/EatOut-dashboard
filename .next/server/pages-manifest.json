@@ -1,9 +1,0 @@
-{
-  "/_app": "pages/_app.js",
-  "/_error": "pages/_error.js",
-  "/_document": "pages/_document.js",
-  "/r/[subdomain]": "pages/r/[subdomain].js",
-  "/dashboard/super/overview": "pages/dashboard/super/overview.js",
-  "/dashboard/website-content": "pages/dashboard/website-content.js",
-  "/dashboard/website": "pages/dashboard/website.js"
-}

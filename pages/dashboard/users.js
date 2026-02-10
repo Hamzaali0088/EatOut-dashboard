@@ -122,27 +122,27 @@ export default function UsersPage() {
         >
           <form onSubmit={handleSubmit} className="space-y-3 text-xs">
             <div className="space-y-1">
-              <label className="text-neutral-300 text-[11px]">Name</label>
+              <label className="text-gray-700 dark:text-neutral-300 text-[11px]">Name</label>
               <input
                 type="text"
                 value={form.name}
                 onChange={e => setForm(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="Full name"
-                className="w-full px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-700 text-xs outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
+                className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-xs text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-neutral-300 text-[11px]">Email</label>
+              <label className="text-gray-700 dark:text-neutral-300 text-[11px]">Email</label>
               <input
                 type="email"
                 value={form.email}
                 onChange={e => setForm(prev => ({ ...prev, email: e.target.value }))}
                 placeholder="name@example.com"
-                className="w-full px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-700 text-xs outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
+                className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-xs text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-neutral-300 text-[11px]">
+              <label className="text-gray-700 dark:text-neutral-300 text-[11px]">
                 {form.id ? "Password (optional, to reset)" : "Password"}
               </label>
               <input
@@ -152,15 +152,15 @@ export default function UsersPage() {
                   setForm(prev => ({ ...prev, password: e.target.value }))
                 }
                 placeholder={form.id ? "Leave blank to keep existing" : "Minimum 6 characters"}
-                className="w-full px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-700 text-xs outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
+                className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-xs text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-neutral-300 text-[11px]">Role</label>
+              <label className="text-gray-700 dark:text-neutral-300 text-[11px]">Role</label>
               <select
                 value={form.role}
                 onChange={e => setForm(prev => ({ ...prev, role: e.target.value }))}
-                className="w-full px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-700 text-xs outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
+                className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-xs text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
               >
                 {ROLE_OPTIONS.map(r => (
                   <option key={r.value} value={r.value}>
@@ -194,7 +194,7 @@ export default function UsersPage() {
         >
           <div className="max-h-96 overflow-y-auto text-xs">
             <table className="w-full text-xs">
-              <thead className="text-[11px] uppercase text-neutral-500 border-b border-neutral-800">
+              <thead className="text-[11px] uppercase text-gray-500 border-b border-gray-200">
                 <tr>
                   <th className="py-2 text-left">Name</th>
                   <th className="py-2 text-left">Email</th>
@@ -203,13 +203,13 @@ export default function UsersPage() {
                   <th className="py-2 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-900">
+              <tbody className="divide-y divide-gray-200">
                 {users.map(user => (
-                  <tr key={user.id} className="hover:bg-neutral-950/60">
+                  <tr key={user.id} className="hover:bg-gray-50">
                     <td className="py-2 pr-3">
-                      <div className="font-medium text-neutral-100">{user.name}</div>
+                      <div className="font-medium text-gray-900">{user.name}</div>
                     </td>
-                    <td className="py-2 pr-3 text-neutral-300">{user.email}</td>
+                    <td className="py-2 pr-3 text-gray-700">{user.email}</td>
                     <td className="py-2 pr-3">{roleBadge(user.role)}</td>
                     <td className="py-2 pr-3 text-neutral-500">
                       {new Date(user.createdAt).toLocaleDateString()}

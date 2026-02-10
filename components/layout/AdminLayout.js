@@ -16,16 +16,18 @@ import {
 } from "lucide-react";
 import { getToken } from "../../lib/apiClient";
 import { useTheme } from "../../contexts/ThemeContext";
+import { getTenantRoute } from "../../lib/routes";
 
+// Base tenant dashboard routes (tenantSlug will be injected at runtime)
 const tenantNav = [
-  { href: "/dashboard/overview", label: "Overview", icon: LayoutDashboard },
-  { href: "/dashboard/pos", label: "POS", icon: Receipt },
-  { href: "/dashboard/menu", label: "Menu", icon: UtensilsCrossed },
-  { href: "/dashboard/inventory", label: "Inventory", icon: Factory },
-  { href: "/dashboard/website", label: "Website Settings", icon: Settings2 },
-  { href: "/dashboard/website-content", label: "Website Content", icon: Percent },
-  { href: "/dashboard/history", label: "Reports", icon: History },
-  { href: "/dashboard/users", label: "Users", icon: Users }
+  { path: "/dashboard/overview", label: "Overview", icon: LayoutDashboard },
+  { path: "/dashboard/pos", label: "POS", icon: Receipt },
+  { path: "/dashboard/menu", label: "Menu", icon: UtensilsCrossed },
+  { path: "/dashboard/inventory", label: "Inventory", icon: Factory },
+  { path: "/dashboard/website", label: "Website Settings", icon: Settings2 },
+  { path: "/dashboard/website-content", label: "Website Content", icon: Percent },
+  { path: "/dashboard/history", label: "Reports", icon: History },
+  { path: "/dashboard/users", label: "Users", icon: Users }
 ];
 
 const superNav = [
@@ -85,12 +87,19 @@ export default function AdminLayout({ title, children }) {
         </div>
         <nav className="flex-1 p-4 space-y-1">
           {navItems.map(item => {
-            const isActive = router.pathname === item.href;
+            // Super admin nav uses absolute hrefs
+            const href =
+              role === "super_admin"
+                ? item.href
+                : getTenantRoute(router.asPath || router.pathname, item.path);
+
+            const isActive = router.asPath.startsWith(href);
             const Icon = item.icon;
+
             return (
               <Link
-                key={item.href}
-                href={item.href}
+                key={href}
+                href={href}
                 className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive
                     ? "bg-primary text-white"

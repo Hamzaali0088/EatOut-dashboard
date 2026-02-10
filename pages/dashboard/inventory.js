@@ -51,7 +51,7 @@ export default function InventoryPage() {
         >
           <form onSubmit={handleCreate} className="space-y-3 text-xs">
             <div className="space-y-1">
-              <label className="text-neutral-300 text-[11px]">Name</label>
+              <label className="text-gray-700 dark:text-neutral-300 text-[11px]">Name</label>
               <input
                 type="text"
                 value={form.name}
@@ -59,18 +59,18 @@ export default function InventoryPage() {
                   setForm(prev => ({ ...prev, name: e.target.value }))
                 }
                 placeholder="Tomato, Burger Bun, Oil..."
-                className="w-full px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-700 text-xs outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
+                className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-xs text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
               />
             </div>
             <div className="grid gap-2 md:grid-cols-3">
               <div className="space-y-1">
-                <label className="text-neutral-300 text-[11px]">Unit</label>
+                <label className="text-gray-700 dark:text-neutral-300 text-[11px]">Unit</label>
                 <select
                   value={form.unit}
                   onChange={e =>
                     setForm(prev => ({ ...prev, unit: e.target.value }))
                   }
-                  className="w-full px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-700 text-xs outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
+                  className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-xs text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
                 >
                   <option value="kg">kg</option>
                   <option value="liter">liter</option>
@@ -78,7 +78,7 @@ export default function InventoryPage() {
                 </select>
               </div>
               <div className="space-y-1">
-                <label className="text-neutral-300 text-[11px]">Initial stock</label>
+                <label className="text-gray-700 dark:text-neutral-300 text-[11px]">Initial stock</label>
                 <input
                   type="number"
                   min="0"
@@ -86,11 +86,11 @@ export default function InventoryPage() {
                   onChange={e =>
                     setForm(prev => ({ ...prev, initialStock: e.target.value }))
                   }
-                  className="w-full px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-700 text-xs outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
+                  className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-xs text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-neutral-300 text-[11px]">
+                <label className="text-gray-700 dark:text-neutral-300 text-[11px]">
                   Low stock threshold
                 </label>
                 <input
@@ -103,7 +103,7 @@ export default function InventoryPage() {
                       lowStockThreshold: e.target.value
                     }))
                   }
-                  className="w-full px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-700 text-xs outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
+                  className="w-full px-3 py-1.5 rounded-lg bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-xs text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
                 />
               </div>
             </div>
@@ -119,7 +119,7 @@ export default function InventoryPage() {
         >
           <div className="max-h-96 overflow-y-auto text-xs">
             <table className="w-full text-xs">
-              <thead className="text-[11px] uppercase text-neutral-500 border-b border-neutral-800">
+              <thead className="text-[11px] uppercase text-gray-500 border-b border-gray-200">
                 <tr>
                   <th className="py-2 text-left">Item</th>
                   <th className="py-2 text-right">Stock</th>
@@ -127,14 +127,14 @@ export default function InventoryPage() {
                   <th className="py-2 text-right">Adjust</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-900">
+              <tbody className="divide-y divide-gray-200">
                 {items.map(item => (
-                  <tr key={item.id} className="hover:bg-neutral-950/60">
+                  <tr key={item.id} className="hover:bg-gray-50">
                     <td className="py-2 pr-3">
-                      <div className="font-medium text-neutral-100">
+                      <div className="font-medium text-gray-900">
                         {item.name}
                       </div>
-                      <div className="text-[11px] text-neutral-500">
+                      <div className="text-[11px] text-gray-500">
                         Unit: {item.unit}
                       </div>
                     </td>

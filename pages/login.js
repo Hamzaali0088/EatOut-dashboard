@@ -33,12 +33,19 @@ export default function LoginPage() {
       let target = "/dashboard/overview";
       const fromQuery = router.query.from;
 
-      if (typeof fromQuery === "string" && fromQuery.startsWith("/dashboard")) {
+      // Prefer redirect from middleware if present
+      if (typeof fromQuery === "string" && (fromQuery.startsWith("/dashboard") || fromQuery.startsWith("/r/"))) {
         target = fromQuery;
       } else if (user.role === "super_admin") {
         target = "/dashboard/super/overview";
       } else {
-        target = "/dashboard/overview";
+        // For tenant users, redirect to tenant-specific dashboard when slug is available
+        const slug = user.restaurantSlug || data.restaurant?.subdomain;
+        if (slug) {
+          target = `/r/${encodeURIComponent(slug)}/dashboard/overview`;
+        } else {
+          target = "/dashboard/overview";
+        }
       }
 
       // Persist auth info for client-side use (e.g. showing name/role)
@@ -58,19 +65,19 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-neutral-950 border border-neutral-800 rounded-2xl p-6 shadow-xl">
+    <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center px-4">
+      <div className="w-full max-w-md bg-white dark:bg-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-2xl p-6 shadow-xl">
         <div className="flex items-center gap-3 mb-6">
           <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center text-black font-bold">
             EO
           </div>
           <div>
-            <div className="text-sm font-semibold">EatOut Admin</div>
-            <div className="text-xs text-neutral-400">Restaurant Owner Dashboard</div>
+            <div className="text-sm font-semibold text-gray-900 dark:text-white">EatOut Admin</div>
+            <div className="text-xs text-gray-500 dark:text-neutral-400">Restaurant Owner Dashboard</div>
           </div>
         </div>
 
-        <h1 className="text-lg font-semibold tracking-tight mb-1">Admin Login</h1>
+        <h1 className="text-lg font-semibold tracking-tight mb-1 text-gray-900 dark:text-white">Admin Login</h1>
         <p className="text-xs text-neutral-400 mb-5">
           Sign in with your admin credentials to manage orders and menu.
         </p>
@@ -83,25 +90,25 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1">
-            <label className="text-xs text-neutral-300">Email</label>
+            <label className="text-xs text-gray-700 dark:text-neutral-300">Email</label>
             <input
               type="email"
               required
               value={email}
               onChange={e => setEmail(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg bg-neutral-900 border border-neutral-700 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
+              className="w-full px-3 py-2 rounded-lg bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-sm text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
             />
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs text-neutral-300">Password</label>
+            <label className="text-xs text-gray-700 dark:text-neutral-300">Password</label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
                 required
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                className="w-full px-3 py-2 pr-10 rounded-lg bg-neutral-900 border border-neutral-700 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
+                className="w-full px-3 py-2 pr-10 rounded-lg bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 text-sm text-gray-900 dark:text-white outline-none focus:border-primary focus:ring-1 focus:ring-primary/60"
               />
               <button
                 type="button"
